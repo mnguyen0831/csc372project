@@ -1,0 +1,8 @@
+To save:
+git status
+git add .
+git commit -am 'Changes Made Here'
+git push
+
+To update:
+git pull
