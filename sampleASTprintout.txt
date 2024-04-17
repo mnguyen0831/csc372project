@@ -1,0 +1,19 @@
+_int counter .
+counter _is 1 .
+_while counter <= 5 _do {
+    _write counter .
+    ++ counter .
+}
+
+Still figuring out what the ast should look like
+Program{[
+    Declare{
+        type: '_int', 
+        name: VariableId{name: 'counter', type: 'int', token: 'counter'}, 
+        line: 1},
+    Assign{
+        id: 'counter', 
+
+    } 
+
+]}
