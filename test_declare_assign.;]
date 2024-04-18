@@ -1,0 +1,17 @@
+$ Int
+_int emptyInt .
+_int int .
+_int ConstInt _is 1 .
+int _is 2 .
+
+$ Bool
+_bool emptyBool .
+_bool bool .
+_bool ConstBool _is :) .
+bool _is (: .
+
+$ Str
+_str emptyStr .
+_str str .
+_str ConstStr _is "Constant" .
+str _is "Variable" .
