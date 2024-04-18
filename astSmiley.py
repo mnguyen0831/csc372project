@@ -5,40 +5,23 @@ class AST:
     line: int
 
 @dataclass(slots=True)
-class Token(AST):
-    token: str
-
-@dataclass(slots=True)
-class Id(Token):
-    pass
-
-@dataclass(slots=True)
-class VariableId(Id):
-    name: str
+class Expression:
     type: str
 
 @dataclass(slots=True)
-class BoolConstantId(Id):
-    name: str
-    val: bool
+class Unary(Expression):
+    op: str
+    expr: Expression
 
 @dataclass(slots=True)
-class IntConstantId(Id):
-    name: str
-    val: int
-
-@dataclass(slots=True)
-class StrConstantId(Id):
-    name: str
-    val: str
-
-@dataclass(slots=True)
-class Expression(AST):
-    type: str
+class Binary(Expression):
+    lhs: Expression
+    op: str
+    rhs: Expression
 
 @dataclass(slots=True)
 class Literal(Expression):
-    token: str
+    pass
 
 @dataclass(slots=True)
 class Bool(Literal):
@@ -53,6 +36,11 @@ class Str(Literal):
     val: str
 
 @dataclass(slots=True)
+class Id(Expression):
+    name: str
+    constant: bool
+
+@dataclass(slots=True)
 class Statement(AST):
     pass
 
@@ -63,8 +51,8 @@ class Declaration(Statement):
 
 @dataclass(slots=True)
 class Assign(Statement):
-    id: VariableId
-    expr: Expression = None
+    id: Id
+    expr: Expression
 
 @dataclass(slots=True)
 class Print(Statement):
@@ -73,9 +61,18 @@ class Print(Statement):
 @dataclass(slots=True)
 class If(Statement):
     expr: Expression
-    stmt: Statement
+    stmt: list[Statement]
 
 @dataclass(slots=True)
 class Else(Statement):
-    expr: Expression = None
-    stmt: Statement
+    expr: Expression
+    stmt: list[Statement]
+
+@dataclass(slots=True)
+class While(Statement):
+    expr: Expression
+    stmt: list[Statement]
+
+@dataclass(slots=True)
+class Program:
+    stmt: list[Statement]

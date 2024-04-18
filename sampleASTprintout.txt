@@ -5,15 +5,41 @@ _while counter <= 5 _do {
     ++ counter .
 }
 
-Still figuring out what the ast should look like
-Program{[
-    Declare{
-        type: '_int', 
-        name: VariableId{name: 'counter', type: 'int', token: 'counter'}, 
-        line: 1},
-    Assign{
-        id: 'counter', 
-
-    } 
-
-]}
+Program{
+    stmt: [
+        Declare{
+            type: '_int', 
+            name: VariableId{
+                name: 'counter', 
+                type: 'int'}, 
+            line: 1},
+        Assign{
+            id: VariableId{
+                name: 'counter', 
+                type: 'int'}, 
+            expr: Int{
+                type: '_int',
+                val: 1}
+            line: 2},
+        While{
+            expr: Binary{
+                lhs: Id{
+                    name: 'counter',
+                    constant: False,
+                    type: '_int'}
+                op: '<=',
+                rhs: Int{
+                    type: '_int',
+                    val: 5}
+                type: '_Bool'}
+            stmt: [
+                Print{
+                    expr: Id{
+                        name: 'counter',
+                        constant: False,
+                        type: '_int'}},
+                Unary{
+                    op: '++',
+                    expr: Id{
+                        name: 'counter',
+                        type: '_int'}}]}]}

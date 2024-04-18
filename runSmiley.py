@@ -1,5 +1,5 @@
-from tokenSmiley import tokenizeLine, tokenizeSmiley
-import executeSmiley as smile
+from scanSmiley import scanLine, scanSmiley
+import parseSmiley as smile
 import argparse
 
 input_line: str
@@ -14,18 +14,20 @@ variables: dict[str, bool | int | str]
 # python runSmiley.py --input-line '1 + 2 + 3 .'
 
 def main() -> None:
-    global program, variables
+    global program, variables, print_ast
     variables = dict()
     getInput()
     if input_file is None:
-        program = tokenizeLine(input_line)
+        program = scanLine(input_line)
     else:
-        program = [tokenizeSmiley(input_file)]
+        program = [scanSmiley(input_file)]
     for line in program:
         execute(line)
+    if print_ast:
+        print("Print AST not implemented.")
 
 def getInput() -> None:
-    global input_line, input_file, output_file, ast
+    global input_line, input_file, output_file, print_ast
     parser = argparse.ArgumentParser(description='Reads command line arguments.')
     parser.add_argument('--input-line', type=str, help='Line to run')
     parser.add_argument('--input-file', type=str, default=None, help='File name to run')
