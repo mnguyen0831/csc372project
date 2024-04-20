@@ -1,0 +1,40 @@
+# Program
+<program> ::= <statement>
+
+# IDs
+<id> ::= <var id> | <const id>
+<var id> ::= starts with lowercase char, ends at whitespace
+<const id> ::= starts with uppercase char, ends at whitespace 
+<type> ::= _int | _str | _bool
+
+# Literals
+<literal> ::= <int> | <string> | <boolean>
+<int> ::= 0-9 | 0-9<int> 
+<string> :: = "string"
+<boolean> ::= <true> | <false> 
+<true> ::= :) | (: | :^) | (^: | :’) | (’:
+<false> ::= :( | ): | :^( | )^: | :’( | )‘:
+
+# Statements
+<statement> ::= <declaration st> | <assign st> | <read st> | <print st> | <if st> | <while st> | <statement> <statement> | <comment>
+<comment> ::= $ anything
+<declaration st> ::= <type> <var id> | <type> <const id> _is <literal> . 
+<assign st> ::= <var id> _is <expr> . | <var id> ++ . | <var id> += <expr> .
+<read st> ::= _read <var id> .
+<print st> ::= _writeline <expr> . | _write <expr> .
+<if st> ::= _if <expr> _then { <statement> } | _if <expr> _then { <statement> } <else>
+<else> ::= _else { <statement> } | _elseif <expr> _then { <statement> } | _elseif <expr> _then { <statement> } <else>
+<while st> ::= _while <expr> _do { <statement> }
+
+# Expressions
+<expr> ::= <unary expr> | <binary expr> 
+<binary expr> ::= <unary expr> <binary op> <expr> | <binary op> <expr>
+<unary expr> ::= <unary op> <base expr> | <base expr> 
+<base expr> ::= <id> | <literal> | ( <expr> ) 
+
+# Operators
+<unary op> ::= - | ^
+<binary op> ::= <multi op> | <add op> | <comp op>
+<multi op> ::= * | / | %
+<add op> ::= + | -
+<comparator op> ::= & | | | <= | < | >= | > | = | !=
