@@ -1,11 +1,8 @@
-from scanSmiley import scanLine, scanSmiley
 import parseSmiley as smile
 import argparse
 
-input_line: str
+repl: str
 input_file: str
-output_file: str
-print_ast: bool
 print_vars: bool
 program: list[list[str]]
 variables: dict[str, list[str, bool | int | str]] # key: id, val: [type, value], types are {'_int', '_bool', '_str', 'const _int', 'const _bool', 'const _str}
@@ -13,42 +10,50 @@ cur_line: int
 
 # Files can be run using:
 # python runSmiley.py --input-file 'sample.;]'
-# python runSmiley.py --input-line '1 + 2 + 3 .'
+# python runSmiley.py --repl
 
 def main() -> None:
-    global program, variables, print_ast, print_vars, cur_line
+    global repl, input_file, program, variables, print_vars, cur_line
     variables = dict()
     cur_line = 1
-    print(smile.expr('"Answer is: " + ( ( 1 + ( 1 * 5 ) - 4 ) % 2 ) + "." .'.split(), variables, 1))
     getInput()
-    if input_file is None:
-        program = [scanLine(input_line)]
-    else:
+    if repl:
+        lineIn()
+    elif len(input_file) > 0:
         program = scanSmiley(input_file)
-    while cur_line - 1 < len(program):
-        print(f"Executing line {cur_line}: {program[cur_line - 1]}")
-        execute(program[cur_line - 1])
-    if print_ast:
-        print("Print AST not implemented.")
+        while cur_line - 1 < len(program):
+            print(f"Executing line {cur_line}: {program[cur_line - 1]}")
+            execute(program[cur_line - 1])
     if print_vars:
         print("\nVariables:\n----------")
         for var in variables.keys():
             print(f"{var} : {variables[var]}")
 
 def getInput() -> None:
-    global input_line, input_file, output_file, print_ast, print_vars
+    global repl, input_file, print_vars
     parser = argparse.ArgumentParser(description='Reads command line arguments.')
-    parser.add_argument('--input-line', type=str, help='Line to run')
-    parser.add_argument('--input-file', type=str, default=None, help='File name to run')
-    parser.add_argument('--output-file', type=str, help='File to write to output')
-    parser.add_argument('--ast', type=bool, default=False, help='Prints out Syntax Tree')
-    parser.add_argument('--vars', type=bool, default=False, help='Prints out Variable Dictionary')
+    parser.add_argument('--repl', action='store_true', help='Line to run')
+    parser.add_argument('--input-file', type=str, default='', help='File name to run')
+    parser.add_argument('--vars', action='store_true', help='Prints out Variable Dictionary')
     args = parser.parse_args()
-    input_line = args.input_line
+    repl = args.repl
     input_file = args.input_file
-    output_file = args.output_file
-    print_ast = args.ast
     print_vars = args.vars
+
+def scanSmiley(fname: str) -> list[list[str]]:
+    try:
+        file = open(fname, 'r')
+    except FileNotFoundError:
+        print(f"File '{fname}' does not exist")
+        lines = []
+    else:
+        print(f"Open: '{fname}'")
+        lines = file.readlines()
+    tokens: list[list[str]] = list()
+
+    for line in lines:
+        tokens.append(line.split())
+    return tokens
 
 def execute(line: list[str]) -> None:
     global variables, cur_line
@@ -64,10 +69,8 @@ def execute(line: list[str]) -> None:
         raise Exception(f"Line {cur_line} is not properly terminated")
     if line[0] in {'_int', '_str', '_bool'}:
         variables = smile.declare(line, variables, cur_line)
-        #print(f"Variables updated: {variables}")
     elif line[0] in variables.keys():
         variables = smile.assign(line, variables, cur_line)
-        #print(f"Variables updated: {variables}")
     elif line[0] == '_read':
         pass # variables = smile.read(line, variables, cur_line)
     elif line[0] in {'_write', '_writeline'}:
@@ -79,6 +82,24 @@ def execute(line: list[str]) -> None:
             raise Exception(f"Variable '{line[0]}' at line {cur_line} hasn't been declared")
     cur_line += 1
 
+def lineIn():
+    print('Welcome to the .;] input REPL. To exit, input: _exit .')
+    while True:
+        userIn = input("\( '3'){ ")
+        if userIn == '_exit .':
+            break
+        try:
+            execute(userIn.split())
+        except NameError:
+            print("The variable you attempted to use has not been initialized. Please try again.")
+        except SyntaxError:
+            print("Something in your syntax was invalid. Please try again.")
+        except TypeError:
+            print("The input expression does not match the type expected. Please try again.")
+        except ValueError:
+            print("An input value is invalid. Please try again.")
+        except Exception:
+            print("The input line was invalid. Please try again.")
 
 if __name__ == "__main__":
     main()

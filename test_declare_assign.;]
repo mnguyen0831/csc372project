@@ -2,7 +2,8 @@ $ Int
 _int emptyInt .
 _int int .
 _int ConstInt _is 1 .
-int _is 2 .
+int _is 3 .
+int _is int + int .
 
 $ Bool
 _bool emptyBool .
@@ -13,5 +14,5 @@ bool _is (: .
 $ Str
 _str emptyStr .
 _str str .
-_str ConstStr _is " Constant Value . " .
+_str ConstStr _is "helloworld" .
 str _is "Variable" .
