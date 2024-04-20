@@ -58,9 +58,6 @@ def execute(line: list[str]) -> None:
     if line[0] in {'$'}:
         cur_line += 1
         return
-    if len(line) == 0:
-        cur_line += 1
-        return
     if '$' in line:
         line = line[:line.index('$') + 1]
     elif '.' not in line:
