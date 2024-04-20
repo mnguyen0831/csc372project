@@ -77,7 +77,7 @@ def expr(line: list[str], variables: dict[str,  list[int | bool | str | None]], 
         val, cur = andExpr(val, cur, variables, lnum)
     if len(cur) != 0 and cur[0] in {'|'}:
         val, cur = orExpr(val, cur, variables, lnum)
-    if len(cur) != 0 and cur[0] != '.':
+    if len(cur) != 0 and cur[0] != '.' and cur[0] != '_do':
         raise ValueError(f"Token '{cur[0]}' on line {lnum} is an invalid operator")
     return val, cur
 
