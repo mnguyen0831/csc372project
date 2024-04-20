@@ -11,7 +11,7 @@ def declare(line: list[str], variables: dict[str,  list[int | bool | str | None]
     if line[1][0].islower():
         var[line[1]] = [line[0], None]
     elif line[1][0].isupper():
-        val = baseExpr(line[3:], var, lnum)[0]
+        val = baseExpr(line[3:], var, lnum)[0] # This ensures that the constant is declared with a literal
         validateVal(line[0], val, lnum)
         var[line[1]] = ['const ' + line[0], val]
     return var 
@@ -25,7 +25,7 @@ def assign(line: list[str], variables: dict[str,  list[int | bool | str | None]]
         # Checks if the variable type is a constant
         if len(var[line[0]][0]) > 5:
             raise TypeError(f"Constant {line[0]} of type {var[line[0]][0]} on line {lnum} cannot be reassigned.")
-        val = expr(line[2:], variables, lnum)[0] # Passes <expr> and outputs value of the entire expression
+        val = evalExpr(line[2:], variables, lnum) # Passes <expr> and outputs value of the entire expression
         validateVal(var[line[0]][0], val, lnum) # Checks that the type of the variable matches the type of the value
         var[line[0]][1] = val # Assigns value to variable now that the value has been validated
     elif line[1] == '++':
@@ -41,7 +41,7 @@ def assign(line: list[str], variables: dict[str,  list[int | bool | str | None]]
         if var[line[0]][0] == '_int':
             if var[line[0]][1] is None:
                 raise Exception(f"Variable '{line[0]}' hasn't been initialized yet")
-            val = expr(line[2:], variables, lnum)[0]
+            val = evalExpr(line[2:], variables, lnum)
             validateVal(var[line[0]][0], val, lnum)
             var[line[0]][1] += val
         elif var[line[0]][0] == 'const _int':
