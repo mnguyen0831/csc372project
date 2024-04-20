@@ -19,13 +19,14 @@ def main() -> None:
     global program, variables, print_ast, print_vars, cur_line
     variables = dict()
     cur_line = 1
+    print(smile.expr('"Answer is: " + ( ( 1 + ( 1 * 5 ) - 4 ) % 2 ) + "." .'.split(), variables, 1))
     getInput()
     if input_file is None:
         program = [scanLine(input_line)]
     else:
         program = scanSmiley(input_file)
     while cur_line - 1 < len(program):
-        #print(f"Executing line {cur_line}: {program[cur_line - 1]}")
+        print(f"Executing line {cur_line}: {program[cur_line - 1]}")
         execute(program[cur_line - 1])
     if print_ast:
         print("Print AST not implemented.")
@@ -57,7 +58,14 @@ def execute(line: list[str]) -> None:
     if line[0] in {'$'}:
         cur_line += 1
         return
-    elif line[0] in {'_int', '_str', '_bool'}:
+    if len(line) == 0:
+        cur_line += 1
+        return
+    if '$' in line:
+        line = line[:line.index('$') + 1]
+    elif '.' not in line:
+        raise Exception(f"Line {cur_line} is not properly terminated")
+    if line[0] in {'_int', '_str', '_bool'}:
         variables = smile.declare(line, variables, cur_line)
         #print(f"Variables updated: {variables}")
     elif line[0] in variables.keys():

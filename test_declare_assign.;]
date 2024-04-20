@@ -13,5 +13,5 @@ bool _is (: .
 $ Str
 _str emptyStr .
 _str str .
-_str ConstStr _is "Constant" .
+_str ConstStr _is " Constant Value . " .
 str _is "Variable" .
