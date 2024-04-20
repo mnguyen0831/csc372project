@@ -58,6 +58,9 @@ def assign(line: list[str], variables: dict[str,  list[int | bool | str | None]]
 # In the line 'b _is "The answer is: " + c + "." .' 
 # a = ['b', '_is', '"The', 'answer', 'is:', '"', '+', 'c', '+', '"."', '.']
 # pass in a[2:], which is: ['"The', 'answer', 'is:', '"', '+', 'c', '+', '"."', '.']
+def evalExpr(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> int | bool | str:
+    return expr(line, variables, lnum)[0]
+
 def expr(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> tuple[str | int | bool, list[str]]:
     val = None
     cur = None
@@ -81,7 +84,7 @@ def expr(line: list[str], variables: dict[str,  list[int | bool | str | None]], 
         raise ValueError(f"Token '{cur[0]}' on line {lnum} is an invalid operator")
     return val, cur
 
-def unaryExpr(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> tuple[str | int | bool, list[str]]:
+def unaryExpr(line: list[str], variables: dict[str, list[int | bool | str | None]], lnum: int) -> tuple[str | int | bool, list[str]]:
     val = None
     cur = None
     if line[0] == '-':
