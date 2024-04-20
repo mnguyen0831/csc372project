@@ -8,7 +8,7 @@ output_file: str
 print_ast: bool
 print_vars: bool
 program: list[list[str]]
-variables: dict[str, list[str, bool | int | str]] # key: id, val: [type, value]
+variables: dict[str, list[str, bool | int | str]] # key: id, val: [type, value], types are {'_int', '_bool', '_str', 'const _int', 'const _bool', 'const _str}
 cur_line: int
 
 # Files can be run using:

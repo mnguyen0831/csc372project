@@ -20,13 +20,14 @@ def assign(line: list[str], variables: dict[str,  list[int | bool | str | None]]
     # <assign st> ::= <var id> _is <expr> . | <var id> ++ . | <var id> += <expr> .
     var = variables.copy()
     if len(line) < 3:
-        raise Exception(f"Assign statement syntax at line {lnum} is incorrect")
+        raise SyntaxError(f"Assign statement syntax at line {lnum} is incorrect")
     if line[1] == '_is':
+        # Checks if the variable type is a constant
         if len(var[line[0]][0]) > 5:
-            raise Exception(f"Constant {line[0]} of type {var[line[0]][0]} on line {lnum} cannot be reassigned.")
-        val = expr(line[2:], variables, lnum)[0]
-        validateVal(var[line[0]][0], val, lnum)
-        var[line[0]][1] = val
+            raise TypeError(f"Constant {line[0]} of type {var[line[0]][0]} on line {lnum} cannot be reassigned.")
+        val = expr(line[2:], variables, lnum)[0] # Passes <expr> and outputs value of the entire expression
+        validateVal(var[line[0]][0], val, lnum) # Checks that the type of the variable matches the type of the value
+        var[line[0]][1] = val # Assigns value to variable now that the value has been validated
     elif line[1] == '++':
         if var[line[0]][0] == '_int':
             if var[line[0]][1] is None:
