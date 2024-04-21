@@ -1,12 +1,34 @@
 import parseSmiley as smile
 import argparse
 
-repl: str
+"""
+    Command line flags
+"""
 input_file: str
+repl: str
 print_vars: bool
+print_flow: bool
+
+"""
+    The list of all of the lines in the input program, where each line is split by 
+    whitespace.
+    Ex. program[i] = ['token1', 'token2', 'token3', '.']
+"""
 program: list[list[str]]
-variables: dict[str, list[str, bool | int | str]] # key: id, val: [type, value], types are {'_int', '_bool', '_str', 'const _int', 'const _bool', 'const _str}
-cur_line: int # The current line of code that the program is on (corresponds to index cur_line - 1 in program)
+
+"""
+    The current line of code that the program is on. It corresponds to the
+    index cur_line - 1 in the 'program' global variable.
+"""
+cur_line: int
+
+"""
+    List of variables that exist in the program.
+    key: id
+    val: [type, value]
+    type can be {'_int', '_bool', '_str', 'const _int', 'const _bool', 'const _str}
+"""
+variables: dict[str, list[str, bool | int | str]]
 
 """
     Files can be run using:
@@ -23,6 +45,8 @@ cur_line: int # The current line of code that the program is on (corresponds to 
     --vars
         Prints the final list of variables after both the program and REPL have 
         finished executing.
+    --print-flow
+        Prints the line number and the tokenized line of each line as it is executed. 
 """
 def main() -> None:
     global repl, input_file, program, variables, print_vars, cur_line
@@ -54,15 +78,17 @@ def printVars() -> None:
     assigns the global variables accordingly.
 """
 def getInput() -> None:
-    global repl, input_file, print_vars
+    global repl, input_file, print_vars, print_flow
     parser = argparse.ArgumentParser(description='Reads command line arguments.')
     parser.add_argument('--input-file', type=str, default='', help='File name to run')
     parser.add_argument('--repl', action='store_true', help='Opens REPL')
-    parser.add_argument('--vars', action='store_true', help='Prints out Variable Dictionary')
+    parser.add_argument('--vars', action='store_true', help='Prints out variable dictionary')
+    parser.add_argument('--print-flow', action='store_true', help='Prints out the flow of the program')
     args = parser.parse_args()
     repl = args.repl
     input_file = args.input_file
     print_vars = args.vars
+    print_flow = args.print_flow
 
 """
     Scans in the input file name, and stores it into the global program variable. 
@@ -80,8 +106,7 @@ def scanSmiley(fname: str) -> list[list[str]]:
     tokens: list[list[str]] = list()
 
     for line in lines:
-        # Code in something to delete everything to the right of a $ including $
-        tokens.append(line.split())
+        tokens.append(line.strip().split())
     return tokens
 
 """
@@ -89,18 +114,24 @@ def scanSmiley(fname: str) -> list[list[str]]:
     Increments the cur_line as well.
 """
 def execute(line: list[str]) -> None:
-    global program, variables, cur_line
-    print(f"Executing line {cur_line}: {program[cur_line - 1]}")
+    global program, variables, cur_line, print_flow
+    if print_flow:
+        print(f"Executing line {cur_line}: {program[cur_line - 1]}")
+    
+    # Empty line
     if len(line) == 0:
         cur_line += 1
         return
-    if line[0] in {'$', '}'}:
-        cur_line += 1
-        return
+
+    # Ignore inline comment
     if '$' in line:
-        line = line[:line.index('$') + 1]
-    elif '.' not in line and '{' not in line and '}' not in line:
+        line = line[:line.index('$')]
+
+    # Check that the line contains a proper line terminator
+    if '.' not in line and '{' not in line and '}' not in line:
         raise Exception(f"Line {cur_line} is not properly terminated")
+    
+    # Pass line along to the appropriate parsing and execution function
     if line[0] in {'_int', '_str', '_bool'}:
         variables = smile.declarest(line, variables, cur_line)
     elif line[0] in variables.keys():
@@ -109,11 +140,13 @@ def execute(line: list[str]) -> None:
         variables = smile.readst(line, variables, cur_line)
     elif line[0] in {'_write', '_writeline'}:
         smile.printst(line, variables, cur_line)
-    elif line[0] in {'_if'}: # Handle closing bracket and elifs in ifFlow()
+    elif line[0] in {'_if'}:
         ifFlow(line)
-    elif line[0] in {'_while'}: # Handle closing bracket in whileFlow()
+    elif line[0] in {'_while'}:
         pass #whileFlow
         variables = smile.read(line, variables, cur_line)
+    elif line[0] in {'$', '}'}:
+        pass
     else:
         if line[0].isnumeric() or line[0][0] == '_' or line[0][0].isupper():
             raise NameError(f"'{line[0]}' at line {cur_line} is an invalid name for a variable")
@@ -189,28 +222,43 @@ def ifFlow(line) -> None:
                 break # Jump to end of _if structure
     cur_line = end - 1
 
-# Finds structure of if statement
-# [0] is the line number of the final }
-# [1] is a list of all of the line numbers of the elif/else branches of the if statement
+
+"""
+    Given the line number of the _if statement, returns the line number of the final
+    '}' that signifies the end of the structure, as well as a list of all of the line
+    numbers of the '_elseif', and '_else' statements.
+"""
 def getIfStructure(start: int) -> tuple[int, list[int]]:
     global program
     branches: list[int] = list()
+
+    # Begin at the first line in the _if structure past the _if statement
     cur = start + 1
+
+    # Iterate through the program to find the end of the _if structure
     while True:
         if len(program[cur - 1]) > 0:
+            
+            # Record all of the branches of the _if structure
             if len(program[cur - 1]) > 2:
                 if program[cur - 1][0] == '}':
                     if program[cur - 1][1] == '_elseif':
                         branches.append(cur)
                     elif program[cur - 1][1] == '_else':
                         branches.append(cur)
+
+                # Skip past this nested _if structure
                 elif program[cur - 1][0] == '_if':
                     cur = getIfStructure(cur)[0] + 1
+            
+            # Locate the final '}' of the _if structure
             if len(program[cur - 1]) == 1:
                 if program[cur - 1][0] == '}':
                     end = cur - 1
                     break
         cur += 1
+        if cur == len(program):
+            raise SyntaxError(f"_if structure beginning at line {cur_line} was not terminated")
     end = cur
     return end, branches
 
