@@ -160,26 +160,37 @@ def execute(line: list[str]) -> None:
     empty variable list.
 """
 def lineIn() -> None:
-    print('Welcome to the .;] input REPL.\nTo exit, input: "_exit ."\nTo see existing variables, input: "_vars ."')
+    print('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    print('|   Welcome to the .;] input REPL.                |')
+    print('|   To exit, input: "_exit ."                     |')
+    print('|   To see existing variables, input: "_vars ."   |')
+    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n')
     while True:
         userIn = input("s( '3'){ ").strip()
+        valid = True
         if userIn == '_exit .':
             break
         elif userIn == '_vars .':
             printVars()
             continue
-        try:
-            execute(userIn.split())
-        except NameError:
-            print("The variable you attempted to use has not been initialized. Please try again.")
-        except SyntaxError:
-            print("Something in your syntax was invalid. Please try again.")
-        except TypeError:
-            print("The input expression does not match the type expected. Please try again.")
-        except ValueError:
-            print("An input value is invalid. Please try again.")
-        except Exception:
-            print("The input line was invalid. Please try again.")
+        for statement in {'_if', '_while', '_elseif', '_else'}:
+            if statement in userIn.split():
+                print("\t_if statements, and _while statements are unsupported in the REPL. Please try again.")
+                valid = False
+                break
+        if valid:
+            try:
+                execute(userIn.split())
+            except NameError:
+                print("\tThe variable you attempted to use has not been initialized. Please try again.")
+            except SyntaxError:
+                print("\tSomething in your syntax was invalid. Please try again.")
+            except TypeError:
+                print("\tThe input expression does not match the type expected. Please try again.")
+            except ValueError:
+                print("\tAn input value is invalid. Please try again.")
+            except Exception:
+                print("\tThe input line was invalid. Please try again.")
 
 """
     ifFlow walks the program through the _if structure, returning to the main function
