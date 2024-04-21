@@ -1,1 +1,4 @@
 _write "hello world" .
+_int a .
+a _is 5 .
+_writeline a .

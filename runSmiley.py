@@ -78,11 +78,12 @@ def execute(line: list[str]) -> None:
     elif line[0] == '_read':
         variables = smile.readst(line, variables, cur_line)
     elif line[0] in {'_write', '_writeline'}:
-        pass #smile.printst(line, variables, cur_line)
+        smile.printst(line, variables, cur_line)
     elif line[0] in {'_if'}: # Handle closing bracket and elifs in ifFlow()
         ifFlow(line, variables, cur_line)
     elif line[0] in {'_while'}: # Handle closing bracket in whileFlow()
         pass #whileFlow
+        variables = smile.read(line, variables, cur_line)
     else:
         if line[0].isnumeric() or line[0][0] == '_' or line[0][0].isupper():
             raise Exception(f"'{line[0]}' at line {cur_line} is an invalid name for a variable")
