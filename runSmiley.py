@@ -25,9 +25,13 @@ def main() -> None:
             print(f"Executing line {cur_line}: {program[cur_line - 1]}")
             execute(program[cur_line - 1])
     if print_vars:
-        print("\nVariables:\n----------")
-        for var in variables.keys():
-            print(f"{var} : {variables[var]}")
+        printVars()
+
+def printVars() -> None:
+    global variables
+    print("\nVariables:\n----------")
+    for var in variables.keys():
+        print(f"{var} : {variables[var]}")   
 
 def getInput() -> None:
     global repl, input_file, print_vars
@@ -68,13 +72,17 @@ def execute(line: list[str]) -> None:
     elif '.' not in line:
         raise Exception(f"Line {cur_line} is not properly terminated")
     if line[0] in {'_int', '_str', '_bool'}:
-        variables = smile.declare(line, variables, cur_line)
+        variables = smile.declarest(line, variables, cur_line)
     elif line[0] in variables.keys():
-        variables = smile.assign(line, variables, cur_line)
+        variables = smile.assignst(line, variables, cur_line)
     elif line[0] == '_read':
-        pass # variables = smile.read(line, variables, cur_line)
+        variables = smile.readst(line, variables, cur_line)
     elif line[0] in {'_write', '_writeline'}:
-        pass #smile.print(line, variables)
+        pass #smile.printst(line, variables, cur_line)
+    elif line[0] in {'_if'}: # Handle closing bracket and elifs in ifFlow()
+        ifFlow(line, variables, cur_line)
+    elif line[0] in {'_while'}: # Handle closing bracket in whileFlow()
+        pass #whileFlow
     else:
         if line[0].isnumeric() or line[0][0] == '_' or line[0][0].isupper():
             raise Exception(f"'{line[0]}' at line {cur_line} is an invalid name for a variable")
@@ -83,11 +91,14 @@ def execute(line: list[str]) -> None:
     cur_line += 1
 
 def lineIn():
-    print('Welcome to the .;] input REPL. To exit, input: _exit .')
+    print('Welcome to the .;] input REPL.\nTo exit, input: "_exit ."\nTo see existing variables, input: "_vars ."')
     while True:
-        userIn = input("\( '3'){ ")
+        userIn = input("\( '3'){ ").strip()
         if userIn == '_exit .':
             break
+        elif userIn == '_vars .':
+            printVars()
+            continue
         try:
             execute(userIn.split())
         except NameError:
@@ -100,6 +111,21 @@ def lineIn():
             print("An input value is invalid. Please try again.")
         except Exception:
             print("The input line was invalid. Please try again.")
+
+def ifFlow(line):
+    global variables, cur_line
+    val = smile.ifst(line, variables, cur_line)
+    
+    pass
+
+def getIfStructure():
+    pass
+
+def whileFlow():
+    pass
+
+def getWhileStructure():
+    pass
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,6 @@
 from exprSmiley import baseExpr, validateVal, evalExpr
 
-def declare(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> dict[str,  list[int | bool | str | None]]:
+def declarest(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> dict[str,  list[int | bool | str | None]]:
     # <declare st> ::= <type> <var id> . | <type> <const id> _is <literal> .
     var = variables.copy()
     if len(line) < 3:
@@ -20,7 +20,7 @@ def declare(line: list[str], variables: dict[str,  list[int | bool | str | None]
         var[line[1]] = ['const ' + line[0], val]
     return var 
 
-def assign(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> dict[str,  list[int | bool | str | None]]:
+def assignst(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> dict[str,  list[int | bool | str | None]]:
     # <assign st> ::= <var id> _is <expr> . | <var id> ++ . | <var id> += <expr> .
     var = variables.copy()
     if len(line) < 3:
@@ -61,18 +61,35 @@ def readst(line: list[str], variables: dict[str,  list[int | bool | str | None]]
     # if line 
     pass
 
-def printst(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> dict[str,  list[int | bool | str | None]]:
+def printst(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> None:
     # <print st> ::= _writeline <expr> . | _write <expr> .
+    # if line[-1] != '.' throw syntax error
+    # if line[0] == '_writeline' print(evalExpr(line[1:]))
+    # elif line == '_write' print(evalExpr(line[1:]))
     pass
 
-def ifst(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> dict[str,  list[int | bool | str | None]]:
+def ifst(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> bool:
     # <if st> ::= _if <expr> _then { <statement> } | _if <expr> _then { <statement> } <else>
-    pass
+    if len(line) < 4:
+        if '_then' not in line:
+            raise SyntaxError(f"Missing '_then' in line {lnum}")
+        elif '{' not in line:
+            raise SyntaxError(f"Missing '{{' in line {lnum}")
+        else:
+            raise SyntaxError(f"Missing expression in line {lnum}")
+    if line[2] != '_then':
+        raise SyntaxError(f"Missing '_then' in line {lnum}")
+    if line[-1] != '{':
+        raise SyntaxError(f"Missing'{{' in line {lnum}")
+    val = evalExpr(line[1:], variables, lnum)
+    if not isinstance(val, bool):
+        raise TypeError(f"Value of the _if expression on line {lnum} is not type _bool")
+    return val
 
-def elsest(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> dict[str,  list[int | bool | str | None]]:
+def elsest(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> bool:
     # <else> ::= _else { <statement> } | _elseif <expr> _then { <statement> } | _elseif <expr> _then { <statement> } <else>
     pass
 
-def whilest(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> dict[str,  list[int | bool | str | None]]:
+def whilest(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> bool:
     # <while st> ::= _while <expr> _do { <statement> }
     pass
