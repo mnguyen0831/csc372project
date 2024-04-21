@@ -1,0 +1,7 @@
+_int a .
+_read a .
+_writeline "a is " + a .
+_int b .
+b _is a + 10 .
+a += 100 .
+_writeline a + b .

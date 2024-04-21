@@ -54,16 +54,42 @@ def assign(line: list[str], variables: dict[str,  list[int | bool | str | None]]
             raise TypeError(f"Operation '+=' at line {lnum} is invalid for {var[line[0]][0]} types")
     return var
 
-def readst(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> dict[str,  list[int | bool | str | None]]:
-    # <read st> ::= _read <var id> .
-    # if len(line) != 3 throw syntax error
-    # if line[0] not _read throw syntax error
-    # if line 
-    pass
+def read(line: list[str], variables: dict[str, list[int | bool | str | None]], lnum: int) -> dict[
+    str, list[int | bool | str | None]]:
 
-def printst(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> dict[str,  list[int | bool | str | None]]:
+    # <read st> ::= _read <var id> .
+
+    var = variables.copy()
+
+    if len(line) != 3:
+        raise Exception(f"Read statement syntax at line {lnum} is incorrect")
+    if line[-1] != '.':
+        raise Exception(f"Line {lnum} not terminated with '.'")
+    if line[1][0].isupper():
+        raise Exception(f"Variable at line {lnum} can not begin with uppercase")
+    if len(var[line[1]][0]) > 5:
+        raise TypeError(f"Constant {line[0]} of type {var[line[0]][0]} on line {lnum} cannot be reassigned.")
+
+    val = evalExpr(input().strip().split(), variables, lnum)
+    validateVal(var[line[1]][0], val, lnum)
+    var[line[1]][1] = val
+
+    return var
+
+def printst(line: list[str], variables: dict[str, list[int | bool | str | None]], lnum: int) -> None:
+
     # <print st> ::= _writeline <expr> . | _write <expr> .
-    pass
+
+    if len(line) < 3:
+        raise Exception(f"Print statement syntax at line {lnum} is incorrect")
+    if line[-1] != '.':
+        raise Exception(f"Line {lnum} not terminated with '.'")
+
+    val = evalExpr(line[1:], variables, lnum)
+    if line[0] == '_write':
+        print(val, end='')
+    elif line[0] == '_writeline':
+        print(val)
 
 def ifst(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> dict[str,  list[int | bool | str | None]]:
     # <if st> ::= _if <expr> _then { <statement> } | _if <expr> _then { <statement> } <else>
