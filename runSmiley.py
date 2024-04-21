@@ -82,8 +82,7 @@ def execute(line: list[str]) -> None:
     elif line[0] in {'_if'}: # Handle closing bracket and elifs in ifFlow()
         ifFlow(line)
     elif line[0] in {'_while'}: # Handle closing bracket in whileFlow()
-        pass #whileFlow
-        variables = smile.read(line, variables, cur_line)
+        whileFlow(line)
     else:
         if line[0].isnumeric() or line[0][0] == '_' or line[0][0].isupper():
             raise NameError(f"'{line[0]}' at line {cur_line} is an invalid name for a variable")
@@ -165,11 +164,31 @@ def getIfStructure(start: int) -> tuple[int, list[int]]:
     end = cur
     return end, branches
 
-def whileFlow():
-    pass
+def whileFlow(line):
+    global program, variables, cur_line
+    val = smile.whilest(line, variables, cur_line)
+    end = getWhileStructure(cur_line)
 
-def getWhileStructure():
-    pass
+    start = cur_line
+    while val:
+        cur_line = start
+        while cur_line < end:
+            execute(program[cur_line])
+        val = smile.whilest(line, variables, cur_line)
+
+def getWhileStructure(start: int) -> int:
+    global program
+    brackets = 1
+    cur = start + 1
+    while brackets > 0:
+        if '{' in program[cur]:
+            brackets += 1
+        if '}' in program[cur]:
+            brackets -= 1
+
+        cur += 1
+
+    return cur - 1
 
 if __name__ == "__main__":
     main()

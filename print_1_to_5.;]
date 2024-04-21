@@ -1,6 +1,6 @@
 _int counter .
 counter _is 1 .
 _while counter <= 5 _do {
-    _write counter .
-    ++ counter .
+    _writeline counter .
+    counter ++ .
 }

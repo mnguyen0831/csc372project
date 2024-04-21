@@ -54,7 +54,7 @@ def assignst(line: list[str], variables: dict[str,  list[int | bool | str | None
             raise TypeError(f"Operation '+=' at line {lnum} is invalid for {var[line[0]][0]} types")
     return var
 
-def read(line: list[str], variables: dict[str, list[int | bool | str | None]], lnum: int) -> dict[
+def readst(line: list[str], variables: dict[str, list[int | bool | str | None]], lnum: int) -> dict[
     str, list[int | bool | str | None]]:
 
     # <read st> ::= _read <var id> .
@@ -126,6 +126,17 @@ def elsest(line: list[str], variables: dict[str,  list[int | bool | str | None]]
         return val
     return False
 
-def whilest(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> bool:
+
+def whilest(line: list[str], variables: dict[str, list[int | bool | str | None]], lnum: int) -> bool:
     # <while st> ::= _while <expr> _do { <statement> }
-    pass
+
+    if len(line) < 4:
+        if '_do' not in line:
+            raise SyntaxError(f"Missing '_do' in while loop at line {lnum}")
+        if '{' not in line:
+            raise SyntaxError(f"Missing '{{' in line {lnum}")
+    if line[-1] != '{':
+        raise SyntaxError(f"Missing '{{' in line {lnum}")
+
+    val = evalExpr(line[1:], variables, lnum)
+    return val

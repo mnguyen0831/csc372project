@@ -1,0 +1,17 @@
+_writeline "input value to loop through" .
+_int inp .
+_read inp .
+
+_int i .
+i _is 0 .
+
+_while i < inp _do {
+    _if i % 2 = 0 _then {
+        _writeline i + " is even" .
+    }
+    else {
+        _writeline i + " is odd" .
+    }
+
+    i++
+}

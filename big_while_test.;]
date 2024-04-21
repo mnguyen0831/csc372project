@@ -1,0 +1,12 @@
+_int inp .
+_writeline "input a value " .
+_read inp .
+
+_int i .
+i _is 0 .
+_while i < inp _do {
+    _writeline i .
+    i ++ .
+}
+
+_writeline "all finished my dude" .
