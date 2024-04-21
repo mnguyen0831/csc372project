@@ -77,14 +77,11 @@ def read(line: list[str], variables: dict[str, list[int | bool | str | None]], l
     return var
 
 def printst(line: list[str], variables: dict[str, list[int | bool | str | None]], lnum: int) -> None:
-
     # <print st> ::= _writeline <expr> . | _write <expr> .
-
     if len(line) < 3:
         raise Exception(f"Print statement syntax at line {lnum} is incorrect")
     if line[-1] != '.':
         raise Exception(f"Line {lnum} not terminated with '.'")
-
     val = evalExpr(line[1:], variables, lnum)
     if line[0] == '_write':
         print(val, end='')
