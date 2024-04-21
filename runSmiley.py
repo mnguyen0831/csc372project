@@ -69,7 +69,7 @@ def execute(line: list[str]) -> None:
         return
     if '$' in line:
         line = line[:line.index('$') + 1]
-    elif '.' not in line:
+    elif '.' not in line and '{' not in line and '}' not in line:
         raise Exception(f"Line {cur_line} is not properly terminated")
     if line[0] in {'_int', '_str', '_bool'}:
         variables = smile.declarest(line, variables, cur_line)
@@ -80,15 +80,15 @@ def execute(line: list[str]) -> None:
     elif line[0] in {'_write', '_writeline'}:
         smile.printst(line, variables, cur_line)
     elif line[0] in {'_if'}: # Handle closing bracket and elifs in ifFlow()
-        ifFlow(line, variables, cur_line)
+        ifFlow(line)
     elif line[0] in {'_while'}: # Handle closing bracket in whileFlow()
         pass #whileFlow
         variables = smile.read(line, variables, cur_line)
     else:
         if line[0].isnumeric() or line[0][0] == '_' or line[0][0].isupper():
-            raise Exception(f"'{line[0]}' at line {cur_line} is an invalid name for a variable")
+            raise NameError(f"'{line[0]}' at line {cur_line} is an invalid name for a variable")
         else:
-            raise Exception(f"Variable '{line[0]}' at line {cur_line} hasn't been declared")
+            raise NameError(f"Variable '{line[0]}' at line {cur_line} hasn't been declared")
     cur_line += 1
 
 def lineIn():
@@ -116,26 +116,31 @@ def lineIn():
 def ifFlow(line):
     global variables, cur_line
     val = smile.ifst(line, variables, cur_line)
-    getIfStructure()
-    pass
+    print(getIfStructure(cur_line))
 
-def getIfStructure():
-    global program, cur_line
-    brackets = 1
-    start = cur_line
-    cur = cur_line + 1
-    while brackets != 0:
+def getIfStructure(start: int) -> tuple[int, list[int]]:
+    global program
+    branches: list[int] = list()
+    cur = start + 1
+    while True:
         if len(program[cur - 1]) > 0:
-            if program[cur - 1][0] in {'_if', '_while'}:
-                brackets += 1
-            elif program[cur - 1][0] == '}':
-                if len(program[cur - 1]) > 1:
-                    if program[cur - 1] in {'_elseif', '_else'}:
-                        brackets += 1
-                brackets -= 1
+            if len(program[cur - 1]) > 2:
+                if program[cur - 1][0] == '}':
+                    if program[cur - 1][1] == '_elseif':
+                        branches.append(cur)
+                    elif program[cur - 1][1] == '_else':
+                        branches.append(cur)
+                elif program[cur - 1][0] == '_if':
+                    cur = getIfStructure(cur)[0] + 1
+            if len(program[cur - 1]) == 1:
+                if program[cur - 1][0] == '}':
+                    end = cur - 1
+                    break
         cur += 1
     end = cur
-    pass
+    print(f"Start: {start}, End: {end}")
+    print(f"Branches: {branches}")
+    return end, branches
 
 def whileFlow():
     pass

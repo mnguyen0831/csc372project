@@ -1,0 +1,17 @@
+_int val .
+val _is 3 .
+
+_if val = 3 _then {
+    _writeline "_then" . 
+} _elseif val != 3 _then {
+    _if val = 3 _then {
+        _writeline "_if 2" .
+    } _elseif != 3 _then {
+        _writeline "_elseif 2" .
+    }
+    _writeline "_elseif" .
+} _else {
+    _writeline "_else" .
+}
+
+_writeline "out" .

@@ -97,7 +97,7 @@ def ifst(line: list[str], variables: dict[str,  list[int | bool | str | None]], 
             raise SyntaxError(f"Missing '{{' in line {lnum}")
         else:
             raise SyntaxError(f"Missing expression in line {lnum}")
-    if line[2] != '_then':
+    if line[-2] != '_then':
         raise SyntaxError(f"Missing '_then' in line {lnum}")
     if line[-1] != '{':
         raise SyntaxError(f"Missing'{{' in line {lnum}")
@@ -108,7 +108,21 @@ def ifst(line: list[str], variables: dict[str,  list[int | bool | str | None]], 
 
 def elsest(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> bool:
     # <else> ::= _else { <statement> } | _elseif <expr> _then { <statement> } | _elseif <expr> _then { <statement> } <else>
-    pass
+    if len(line) < 4:
+        if '_then' not in line:
+            raise SyntaxError(f"Missing '_then' in line {lnum}")
+        elif '{' not in line:
+            raise SyntaxError(f"Missing '{{' in line {lnum}")
+        else:
+            raise SyntaxError(f"Missing expression in line {lnum}")
+    if line[-2] != '_then':
+        raise SyntaxError(f"Missing '_then' in line {lnum}")
+    if line[-1] != '{':
+        raise SyntaxError(f"Missing'{{' in line {lnum}")
+    val = evalExpr(line[1:], variables, lnum)
+    if not isinstance(val, bool):
+        raise TypeError(f"Value of the _if expression on line {lnum} is not type _bool")
+    return val
 
 def whilest(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> bool:
     # <while st> ::= _while <expr> _do { <statement> }
