@@ -116,10 +116,25 @@ def lineIn():
 def ifFlow(line):
     global variables, cur_line
     val = smile.ifst(line, variables, cur_line)
-    
+    getIfStructure()
     pass
 
 def getIfStructure():
+    global program, cur_line
+    brackets = 1
+    start = cur_line
+    cur = cur_line + 1
+    while brackets != 0:
+        if len(program[cur - 1]) > 0:
+            if program[cur - 1][0] in {'_if', '_while'}:
+                brackets += 1
+            elif program[cur - 1][0] == '}':
+                if len(program[cur - 1]) > 1:
+                    if program[cur - 1] in {'_elseif', '_else'}:
+                        brackets += 1
+                brackets -= 1
+        cur += 1
+    end = cur
     pass
 
 def whileFlow():
