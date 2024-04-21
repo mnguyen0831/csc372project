@@ -6,7 +6,7 @@ input_file: str
 print_vars: bool
 program: list[list[str]]
 variables: dict[str, list[str, bool | int | str]] # key: id, val: [type, value], types are {'_int', '_bool', '_str', 'const _int', 'const _bool', 'const _str}
-cur_line: int
+cur_line: int # The current line of code that the program is on
 
 # Files can be run using:
 # python runSmiley.py --input-file 'sample.;]'
@@ -22,7 +22,6 @@ def main() -> None:
     elif len(input_file) > 0:
         program = scanSmiley(input_file)
         while cur_line - 1 < len(program):
-            print(f"Executing line {cur_line}: {program[cur_line - 1]}")
             execute(program[cur_line - 1])
     if print_vars:
         printVars()
@@ -60,11 +59,12 @@ def scanSmiley(fname: str) -> list[list[str]]:
     return tokens
 
 def execute(line: list[str]) -> None:
-    global variables, cur_line
+    global program, variables, cur_line
+    print(f"Executing line {cur_line}: {program[cur_line - 1]}")
     if len(line) == 0:
         cur_line += 1
         return
-    if line[0] in {'$'}:
+    if line[0] in {'$', '}'}:
         cur_line += 1
         return
     if '$' in line:
@@ -113,11 +113,36 @@ def lineIn():
         except Exception:
             print("The input line was invalid. Please try again.")
 
+# If flow walks through the if structure
 def ifFlow(line):
-    global variables, cur_line
+    global program, variables, cur_line
     val = smile.ifst(line, variables, cur_line)
-    print(getIfStructure(cur_line))
+    end, branches = getIfStructure(cur_line)
+    if val:
+        cur_line += 1
+        while cur_line < branches[0]:
+            execute(program[cur_line - 1])
+            cur_line += 1
+        cur_line -= 1
+    else:
+        for i in range(len(branches)):
+            cur_line = branches[i]
+            val = smile.elsest(program[cur_line - 1], variables, cur_line)
+            if val:
+                cur_line += 1
+                if len(branches) == i + 1:
+                    endLine = end
+                else:
+                    endLine = branches[i + 1]
+                while cur_line < endLine:
+                    execute(program[cur_line - 1])
+                    cur_line += 1
+                break
+    cur_line = end - 1
 
+# Finds structure of if statement
+# [0] is the line number of the final }
+# [1] is a list of all of the line numbers of the elif/else branches of the if statement
 def getIfStructure(start: int) -> tuple[int, list[int]]:
     global program
     branches: list[int] = list()
@@ -138,8 +163,6 @@ def getIfStructure(start: int) -> tuple[int, list[int]]:
                     break
         cur += 1
     end = cur
-    print(f"Start: {start}, End: {end}")
-    print(f"Branches: {branches}")
     return end, branches
 
 def whileFlow():

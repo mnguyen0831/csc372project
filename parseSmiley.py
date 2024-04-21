@@ -108,21 +108,23 @@ def ifst(line: list[str], variables: dict[str,  list[int | bool | str | None]], 
 
 def elsest(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> bool:
     # <else> ::= _else { <statement> } | _elseif <expr> _then { <statement> } | _elseif <expr> _then { <statement> } <else>
-    if len(line) < 4:
-        if '_then' not in line:
-            raise SyntaxError(f"Missing '_then' in line {lnum}")
+    if len(line) < 3:
+        if '_else' not in line and '_elseif' not in line:
+                raise SyntaxError(f"Missing '_else' or '_elseif' in line {lnum}")
         elif '{' not in line:
             raise SyntaxError(f"Missing '{{' in line {lnum}")
-        else:
-            raise SyntaxError(f"Missing expression in line {lnum}")
-    if line[-2] != '_then':
-        raise SyntaxError(f"Missing '_then' in line {lnum}")
     if line[-1] != '{':
-        raise SyntaxError(f"Missing'{{' in line {lnum}")
-    val = evalExpr(line[1:], variables, lnum)
-    if not isinstance(val, bool):
-        raise TypeError(f"Value of the _if expression on line {lnum} is not type _bool")
-    return val
+        raise SyntaxError(f"Missing '{{' in line {lnum}")
+    if line[1] == '_else':
+        if len(line) != 3:
+            raise SyntaxError(f"Too many tokens in '_else' statement on line {lnum}")
+        return True
+    elif line[1] == '_elseif':
+        val = evalExpr(line[2:], variables, lnum)
+        if not isinstance(val, bool):
+            raise TypeError(f"Value of the _if expression on line {lnum} is not type _bool")
+        return val
+    return False
 
 def whilest(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> bool:
     # <while st> ::= _while <expr> _do { <statement> }

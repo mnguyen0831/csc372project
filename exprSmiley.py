@@ -5,6 +5,7 @@
 # a = ['b', '_is', '"The', 'answer', 'is:', '"', '+', 'c', '+', '"."', '.']
 # pass in a[2:], which is: ['"The', 'answer', 'is:', '"', '+', 'c', '+', '"."', '.']
 def evalExpr(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> int | bool | str:
+    #print(f"lnum: {lnum}, evalExpr: {line}")
     return expr(line, variables, lnum)[0]
 
 def expr(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> tuple[str | int | bool, list[str]]:
