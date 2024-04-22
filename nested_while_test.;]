@@ -1,0 +1,14 @@
+_int i .
+_int j .
+i _is 0 .
+
+_while i < 10 _do {
+    j _is 0 .
+    _while j < 10 _do {
+        _write i .
+        _write "," .
+        _writeline j .
+        j ++ .
+    }
+    i ++ .
+}

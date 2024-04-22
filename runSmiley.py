@@ -71,7 +71,7 @@ def printVars() -> None:
     for var in variables.keys():
         type: str = variables[var][0]
         val: int | str | bool = variables[var][1]
-        print(f"{type} {var} _is {val}")   
+        print(f"{type} {var} _is {val}")
 
 """
     Grabs all of the command line arguments that were used with runSmiley.py, and 
@@ -117,7 +117,7 @@ def execute(line: list[str]) -> None:
     global program, variables, cur_line, print_flow
     if print_flow:
         print(f"Executing line {cur_line}: {program[cur_line - 1]}")
-    
+
     # Empty line
     if len(line) == 0:
         cur_line += 1
@@ -130,7 +130,7 @@ def execute(line: list[str]) -> None:
     # Check that the line contains a proper line terminator
     if '.' not in line and '{' not in line and '}' not in line:
         raise Exception(f"Line {cur_line} is not properly terminated")
-    
+
     # Pass line along to the appropriate parsing and execution function
     if line[0] in {'_int', '_str', '_bool'}:
         variables = smile.declarest(line, variables, cur_line)
@@ -248,7 +248,7 @@ def getIfStructure(start: int) -> tuple[int, list[int]]:
     # Iterate through the program to find the end of the _if structure
     while True:
         if len(program[cur - 1]) > 0:
-            
+
             # Record all of the branches of the _if structure
             if len(program[cur - 1]) > 2:
                 if program[cur - 1][0] == '}':
@@ -260,7 +260,7 @@ def getIfStructure(start: int) -> tuple[int, list[int]]:
                 # Skip past this nested _if structure
                 elif program[cur - 1][0] == '_if':
                     cur = getIfStructure(cur)[0] + 1
-            
+
             # Locate the final '}' of the _if structure
             if len(program[cur - 1]) == 1:
                 if program[cur - 1][0] == '}':
@@ -272,18 +272,26 @@ def getIfStructure(start: int) -> tuple[int, list[int]]:
     end = cur
     return end, branches
 
+
+'''
+    Moves through the while statement from the given line
+'''
 def whileFlow(line):
     global program, variables, cur_line
     val = smile.whilest(line, variables, cur_line)
     end = getWhileStructure(cur_line)
 
-    start = cur_line
+    start = cur_line+1
     while val:
         cur_line = start
         while cur_line < end:
-            execute(program[cur_line])
+            execute(program[cur_line-1])
         val = smile.whilest(line, variables, cur_line)
 
+
+'''
+    Finds the end of the while loop and returns the ending line
+'''
 def getWhileStructure(start: int) -> int:
     global program
     brackets = 1
@@ -296,7 +304,7 @@ def getWhileStructure(start: int) -> int:
 
         cur += 1
 
-    return cur - 1
+    return cur
 
 if __name__ == "__main__":
     main()

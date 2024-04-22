@@ -1,6 +1,5 @@
 _int inp .
-_writeline "input a value " .
-_read inp .
+inp _is 10 .
 
 _int i .
 i _is 0 .
