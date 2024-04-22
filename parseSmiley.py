@@ -69,9 +69,23 @@ def readst(line: list[str], variables: dict[str, list[int | bool | str | None]],
         raise Exception(f"Variable at line {lnum} can not begin with uppercase")
     if len(var[line[1]][0]) > 5:
         raise TypeError(f"Constant {line[0]} of type {var[line[0]][0]} on line {lnum} cannot be reassigned.")
+    
+    val: int | bool | str
 
-    val = evalExpr(input().strip().split(), variables, lnum)
-    validateVal(var[line[1]][0], val, lnum)
+    while True:
+        try:
+            val = input().strip().split()
+            val = evalExpr(val, variables, lnum)
+            validateVal(var[line[1]][0], val, lnum)
+        except Exception:
+            print(f"The value '{val}' is not a valid {var[line[1]][0]} type")
+            print('Examples of valid inputs:')
+            print("\tint: - 3")
+            print('\tstr: "String"')
+            print("\tbool: ^ :)")
+            print("Try again.")
+        else:
+            break
     var[line[1]][1] = val
 
     return var

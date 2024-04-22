@@ -98,9 +98,15 @@ def multiExpr(val: int, line: list[str], variables: dict[str,  list[int | bool |
         if op == '*':
             lhs = lhs * rhs
         elif op == '/':
-            lhs = lhs // rhs
+            if rhs == 0:
+                lhs = 0
+            else:
+                lhs = lhs // rhs
         else:
-            lhs = lhs % rhs
+            if rhs == 0:
+                lhs = 0
+            else:
+                lhs = lhs % rhs
     return lhs, cur
 
 def addExpr(val: int, line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> tuple[str | int | bool, list[str]]:

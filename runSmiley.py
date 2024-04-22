@@ -118,18 +118,18 @@ def execute(line: list[str]) -> None:
     if print_flow:
         print(f"Executing line {cur_line}: {program[cur_line - 1]}")
     
+    # Ignore comment
+    if '$' in line:
+        line = line[:line.index('$')]
+
     # Empty line
     if len(line) == 0:
         cur_line += 1
         return
 
-    # Ignore inline comment
-    if '$' in line:
-        line = line[:line.index('$')]
-
     # Check that the line contains a proper line terminator
     if '.' not in line and '{' not in line and '}' not in line:
-        raise Exception(f"Line {cur_line} is not properly terminated")
+        raise SyntaxError(f"Line {cur_line} is not properly terminated")
     
     # Pass line along to the appropriate parsing and execution function
     if line[0] in {'_int', '_str', '_bool'}:
@@ -142,9 +142,9 @@ def execute(line: list[str]) -> None:
         smile.printst(line, variables, cur_line)
     elif line[0] in {'_if'}:
         ifFlow(line)
-    elif line[0] in {'_while'}: # Handle closing bracket in whileFlow()
+    elif line[0] in {'_while'}:
         whileFlow(line)
-    elif line[0] in {'$', '}'}:
+    elif line[0] in {'}'}:
         pass
     else:
         if line[0].isnumeric() or line[0][0] == '_' or line[0][0].isupper():
@@ -204,14 +204,16 @@ def ifFlow(line) -> None:
 
     # Pull out all of the line numbers for the _elseifs, and _else
     end, branches = getIfStructure(cur_line)
-
+ 
     # Execute first _then if the _if expr is True
     if val:
         cur_line += 1
-        while cur_line < branches[0]:
+        if len(branches) > 0:
+            endBranch = branches[0]
+        else:
+            endBranch = end     
+        while cur_line < endBranch:
             execute(program[cur_line - 1])
-            cur_line += 1
-        cur_line -= 1
 
     # Iterate through the _elseif exprs and execute that branch if True
     else:
@@ -228,7 +230,6 @@ def ifFlow(line) -> None:
                     endBranch = branches[i + 1]
                 while cur_line < endBranch:
                     execute(program[cur_line - 1])
-                    cur_line += 1
                 break # Jump to end of _if structure
     cur_line = end - 1
 
@@ -244,11 +245,10 @@ def getIfStructure(start: int) -> tuple[int, list[int]]:
 
     # Begin at the first line in the _if structure past the _if statement
     cur = start + 1
-
+    
     # Iterate through the program to find the end of the _if structure
     while True:
         if len(program[cur - 1]) > 0:
-            
             # Record all of the branches of the _if structure
             if len(program[cur - 1]) > 2:
                 if program[cur - 1][0] == '}':
@@ -260,6 +260,7 @@ def getIfStructure(start: int) -> tuple[int, list[int]]:
                 # Skip past this nested _if structure
                 elif program[cur - 1][0] == '_if':
                     cur = getIfStructure(cur)[0] + 1
+                    continue
             
             # Locate the final '}' of the _if structure
             if len(program[cur - 1]) == 1:
@@ -267,7 +268,7 @@ def getIfStructure(start: int) -> tuple[int, list[int]]:
                     end = cur - 1
                     break
         cur += 1
-        if cur == len(program):
+        if cur == len(program) + 1:
             raise SyntaxError(f"_if structure beginning at line {cur_line} was not terminated")
     end = cur
     return end, branches

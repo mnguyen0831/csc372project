@@ -1,0 +1,38 @@
+_int testInt .
+_write "Input an integer: " .
+_read testInt .
+
+_str testStr .
+_write "Input a string: " .
+_read testStr .
+
+_bool testBool .
+_write "Input a boolean: " .
+_read testBool .
+
+_if testInt < 20 _then {
+    testInt _is testInt - 5 .
+    _writeline testInt .
+    _if testInt > 0 _then {
+        _if testBool _then {
+            _writeline "First ending: " + testStr .
+        } _else {
+            _writeline "Second ending: " + testStr .
+        }
+    } _else {
+        _writeline "Third ending: " + testBool .
+    }
+} _elseif testInt > 20 _then {
+    _int b .
+    b _is testInt % 5 .
+    _int c .
+    c _is testInt % b .
+
+    _if c > 0 _then {
+        _writeline "Fourth ending: " + b .
+    } _else {
+        _writeline "Fifth ending: " + c .
+    }
+} _else {
+    _writeline "Sixth ending: " + testBool + testStr .
+}
