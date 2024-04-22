@@ -302,7 +302,8 @@ def whileFlow(line):
 def getWhileStructure(start: int) -> int:
     global program
     brackets = 1
-    cur = start + 1
+    cur = start
+    line = program[cur]
     while brackets > 0:
         if '{' in program[cur]:
             brackets += 1
