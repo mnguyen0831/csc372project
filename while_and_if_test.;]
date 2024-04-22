@@ -7,11 +7,13 @@ i _is 0 .
 
 _while i < inp _do {
     _if i % 2 = 0 _then {
-        _writeline i + " is even" .
-    }
-    else {
-        _writeline i + " is odd" .
+        _write i .
+        _writeline " is even" .
+    } _else {
+        _write i .
+        _writeline " is odd" .
     }
 
-    i++
+    i ++ .
+
 }
