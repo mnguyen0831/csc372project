@@ -1,5 +1,6 @@
 _int inp .
-inp _is 10 .
+_write " Input here : " . 
+_read inp .
 
 _int i .
 i _is 0 .

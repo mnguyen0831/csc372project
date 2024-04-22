@@ -283,7 +283,7 @@ def getIfStructure(start: int) -> tuple[int, list[int]]:
 '''
     Moves through the while statement from the given line
 '''
-def whileFlow(line):
+def whileFlow(line) -> None:
     global program, variables, cur_line
     val = smile.whilest(line, variables, cur_line)
     end = getWhileStructure(cur_line)
