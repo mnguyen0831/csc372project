@@ -1,2 +1,0 @@
-parser does not catch "i ++" without .
-parser does not catch "else" underscore at beginning
