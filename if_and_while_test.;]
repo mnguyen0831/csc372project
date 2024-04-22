@@ -1,0 +1,10 @@
+_int i .
+i _is 0 .
+
+_if i < 1 _then {
+    _while i < 5 _do {
+        i ++ .
+        _writeline i .
+    }
+}
+_writeline "out" .

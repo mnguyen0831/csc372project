@@ -1,8 +1,14 @@
 To save:
 git status
 git add .
-git commit -am 'Changes Made Here'
+git commit -am 'Changes made here'
 git push
 
 To update:
 git pull
+
+If there are merge conflicts:
+correct merge conflicts
+git add .
+git commit -am 'Changes made here'
+git push

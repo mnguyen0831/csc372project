@@ -263,6 +263,11 @@ def getIfStructure(start: int) -> tuple[int, list[int]]:
                     cur = getIfStructure(cur)[0] + 1
                     continue
 
+                # Skip past this nested _while structure
+            if program[cur - 1][0] == '_while':
+                cur = getWhileStructure(cur)
+                continue
+
             # Locate the final '}' of the _if structure
             if len(program[cur - 1]) == 1:
                 if program[cur - 1][0] == '}':
