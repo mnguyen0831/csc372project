@@ -4,9 +4,9 @@
 ## How to run a Smiley file
 In the folder containing exprSmiley.py, parseSmiley.py, and runSmiley.py, run the command:
 
-    ```
+```
     python runSmiley.py --file 'file_name'
-    ```
+```
     
 The file extension does not matter.
 
