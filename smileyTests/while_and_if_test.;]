@@ -3,6 +3,8 @@ _int inp .
 _read inp .
 
 _int i .
+_int j .
+j _is 2 .
 i _is 0 .
 
 _while i < inp _do {
@@ -11,6 +13,10 @@ _while i < inp _do {
     } _else {
         _writeline "" + i + " is odd" .
     }
-
+    _while j > 0 _do {
+	_writeline "" + j + " is proof that nested while loops work" . 
+	j _is j - 1 .  
+    }
+    j _is 2 . 
     i ++ .
 }

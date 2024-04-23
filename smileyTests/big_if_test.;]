@@ -1,0 +1,32 @@
+_int inp .
+_writeline "Type in a number 0-4 to test <, 5 to test =, greater than 5 to test > ." .
+_read inp .
+
+_if inp = 5 _then {
+    _writeline "" + inp + " is equal to 5" .
+} _elseif inp > 5 _then {
+    _writeline "" + inp + " is greater than 5" .
+} _elseif inp < 5 _then {
+    _writeline "" + inp + " is less than 5" .
+}
+
+_bool Const _is :) .
+
+_writeline "" + Const .
+
+_bool c .
+
+c _is Const .
+
+_writeline "Testing & (and)" .
+_if c & :) _then {
+    _writeline c .
+}
+_writeline "Testing | (or) and ^ (not)" .
+
+c _is ^ c .
+_str String _is "Variable c is now " + c .
+_writeline String .
+_if c | Const _then {
+    _writeline c .
+}
