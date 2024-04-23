@@ -1,5 +1,5 @@
 # Smiley
-### Langauge designed by Matthew Nguyen, Dylan Wilson, Omari Hughes, and Oscar Fischer
+### Language designed by Matthew Nguyen, Dylan Wilson, Omari Hughes, and Oscar Fischer
 
 ## How to run a Smiley file
 In the folder containing exprSmiley.py, parseSmiley.py, and runSmiley.py, run the command:
