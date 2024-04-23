@@ -1,4 +1,5 @@
 import parseSmiley as smile
+from exprSmiley import raiseErr
 import argparse
 
 
@@ -37,14 +38,14 @@ variables: dict[str, list[str, bool | int | str]]
 
 """
     Files can be run using:
-    python runSmiley.py --input-file 'sample.;]'
+    python runSmiley.py --file 'sample.;]'
 
     Flags:
-    --input-file [file-name]
+    --file [file-name]
         Opens, parses, and executes the file named 'file-name'. The file extension does
         not matter.
     --repl
-        Opens up the Smiley REPL. If used with --input-file, the file will be executed 
+        Opens up the Smiley REPL. If used with --file, the file will be executed 
         first, then the REPL will open and use the variable pool from the previously
         executed program.
     --vars
@@ -88,13 +89,13 @@ def printVars() -> None:
 def getInput() -> None:
     global repl, input_file, print_vars, print_flow
     parser = argparse.ArgumentParser(description='Reads command line arguments.')
-    parser.add_argument('--input-file', type=str, default='', help='File name to run')
+    parser.add_argument('--file', type=str, default='', help='File name to run')
     parser.add_argument('--repl', action='store_true', help='Opens REPL')
     parser.add_argument('--vars', action='store_true', help='Prints out variable dictionary')
     parser.add_argument('--print-flow', action='store_true', help='Prints out the flow of the program')
     args = parser.parse_args()
     repl = args.repl
-    input_file = args.input_file
+    input_file = args.file
     print_vars = args.vars
     print_flow = args.print_flow
 
@@ -125,7 +126,7 @@ def scanSmiley(fname: str) -> list[list[str]]:
 """
 def execute(line: list[str]) -> None:
     global program, variables, cur_line, print_flow
-    if print_flow:
+    if print_flow and cur_line != 0:
         print(f"Executing line {cur_line}: {program[cur_line - 1]}")
     
     # Ignore comment
@@ -139,7 +140,7 @@ def execute(line: list[str]) -> None:
 
     # Check that the line contains a proper line terminator
     if '.' not in line and '{' not in line and '}' not in line:
-        raise SyntaxError(f"Line {cur_line} is not properly terminated")
+        raiseErr(f"SyntaxError: Line {cur_line} is not properly terminated", cur_line)
 
     # Pass line along to the appropriate parsing and execution function
     if line[0] in {'_int', '_str', '_bool'}:
@@ -158,9 +159,9 @@ def execute(line: list[str]) -> None:
         pass
     else:
         if line[0].isnumeric() or line[0][0] == '_' or line[0][0].isupper():
-            raise NameError(f"'{line[0]}' at line {cur_line} is an invalid name for a variable")
+            raiseErr(f"NameError: '{line[0]}' at line {cur_line} is an invalid name for a variable", cur_line)
         else:
-            raise NameError(f"Variable '{line[0]}' at line {cur_line} hasn't been declared")
+            raiseErr(f"NameError: Variable '{line}' at line {cur_line} hasn't been declared", cur_line)
     cur_line += 1
 
 
@@ -170,12 +171,14 @@ def execute(line: list[str]) -> None:
     empty variable list.
 """
 def lineIn() -> None:
+    global cur_line
     print('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     print('|   Welcome to the .;] input REPL.                |')
     print('|   To exit, input: "_exit ."                     |')
     print('|   To see existing variables, input: "_vars ."   |')
     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n')
     while True:
+        cur_line = 0
         userIn = input("s( '3'){ ").strip()
         valid = True
         if userIn == '_exit .':
@@ -188,19 +191,12 @@ def lineIn() -> None:
                 print("\t_if statements, and _while statements are unsupported in the REPL. Please try again.")
                 valid = False
                 break
-        if valid:
-            try:
-                execute(userIn.split())
-            except NameError:
-                print("\tThe variable you attempted to use has not been initialized, or is invalid. Please try again.")
-            except SyntaxError:
-                print("\tSomething in your syntax was invalid. Please try again.")
-            except TypeError:
-                print("\tThe input expression does not match the type expected. Please try again.")
-            except ValueError:
-                print("\tAn input value is invalid. Please try again.")
-            except Exception:
-                print("\tThe input line was invalid. Please try again.")
+        if not valid:
+            continue
+        try:
+            execute(userIn.split())
+        except Exception:
+            pass # Exception is printed out by parser
 
 
 """
@@ -287,7 +283,7 @@ def getIfStructure(start: int) -> tuple[int, list[int]]:
                     break
         cur += 1
         if cur == len(program) + 1:
-            raise SyntaxError(f"_if structure beginning at line {cur_line} was not terminated")
+            raiseErr(f"SyntaxError: _if structure beginning at line {cur_line} was not terminated", cur_line)
     end = cur
     return end, branches
 

@@ -1,3 +1,5 @@
+import sys
+
 """
     Pass in the portion of line that is the expression, which should be the rest of the 
     line (include the '.' token), the current variables list, and the line number lnum
@@ -41,7 +43,7 @@ def expr(line: list[str], variables: dict[str,  list[int | bool | str | None]], 
 
     # Check that the expression has been terminated correctly
     if len(cur) != 0 and cur[0] != '.' and cur[0] != '_do' and cur[0] != '_then':
-        raise SyntaxError(f"Token '{cur[0]}' on line {lnum} is an invalid operator")
+        raiseErr(f"SyntaxError: Token '{cur[0]}' on line {lnum} is an invalid operator", lnum)
     return val, cur
 
 
@@ -54,12 +56,12 @@ def unaryExpr(line: list[str], variables: dict[str, list[int | bool | str | None
     if line[0] == '-':
         val, cur = expr(line[1:], variables, lnum)
         if not isinstance(val, int):
-            raise TypeError(f"value '{val}' on line {lnum} is not an _int, and cannot be used with the '-' operator")
+            raiseErr(f"TypeError: value '{val}' on line {lnum} is not an _int, and cannot be used with the '-' operator", lnum)
         val = -val
     elif line[0] == '^':
         val, cur = expr(line[1:], variables, lnum)
         if not isinstance(val, bool):
-            raise TypeError(f"value '{val}' on line {lnum} is not a _bool, and cannot be used with the '^' operator")
+            raiseErr(f"TypeError: value '{val}' on line {lnum} is not a _bool, and cannot be used with the '^' operator", lnum)
         val = not val
     return val, cur
 
@@ -80,7 +82,7 @@ def parenExpr(line: list[str], variables: dict[str,  list[int | bool | str | Non
             parens += 1
         i += 1
     if parens != 0:
-        raise SyntaxError(f"Missing parentheses on line {lnum}")
+        raiseErr(f"SyntaxError: Missing parentheses on line {lnum}", lnum)
     return expr(lineStr[:i - 1].split(), variables, lnum)[0], lineStr[i:].split()
 
 
@@ -103,7 +105,7 @@ def baseExpr(line: list[str], variables: dict[str,  list[int | bool | str | None
         val = validateBool(line[0], lnum)
         lenVal = len(line[0]) 
     else:
-        raise ValueError(f"Token '{line[0]}' on line {lnum} is not a valid value")
+        raiseErr(f"ValueError: Token '{line[0]}' on line {lnum} is not a valid value", lnum)
     return val, (' ').join(line)[lenVal:].split()
 
 
@@ -267,7 +269,7 @@ def validateInt(i: str, lnum: int) -> int:
     try:
         val = int(i)
     except:
-        raise TypeError(f"'{i}' at line {lnum} is not a valid _int value")
+        raiseErr(f"ValueError: '{i}' at line {lnum} is not a valid _int value", lnum)
     return val
 
 
@@ -280,7 +282,7 @@ def validateBool(b: str, lnum: int) -> bool:
     elif b in {':(','):',':^(', ')^:', ':`(', ')`:'}:
         val = False
     else:
-        raise Exception(f"'{b}' at line {lnum} is not a valid _bool value")
+        raiseErr(f"ValueError: '{b}' at line {lnum} is not a valid _bool value", lnum)
     return val
 
 
@@ -291,7 +293,7 @@ def validateStr(s: str, lnum: int) -> str:
     if '"' in [*s] and '"' in [*s][1:]:
         val = s[s.index('"') + 1: s[1:].index('"') + 1]
     else:
-        raise Exception(f"line {lnum} does not have a valid _str value")
+        raiseErr(f"ValueError: Line {lnum} does not have a valid _str value", lnum)
     return val
 
 
@@ -307,41 +309,41 @@ def validateVal(type: str, val: int | bool | str, lnum: int) -> None:
     if type == '_str' and not isinstance(val, str):
         raiseError = True
     if raiseError:
-        raise TypeError(f'Value {val} on line {lnum} is not type {type}')
+        raiseErr(f"TypeError: Value {val} on line {lnum} is not type {type}", lnum)
     
 
 """
     Validates the left hand side value and the right hand side value of the operator token
 """
 def validateLR(op: str, lhs: int | bool | str, rhs: int | bool | str, lnum: int) -> None:
-    raiseError = False
+    raiseErrError = False
     val = None
     type = None
     if op in {'+', '-', '*', '/', '%', "<", "<=", ">", ">="}:
         if op == '+' and isinstance(lhs, str):
             return
         elif not isinstance(lhs, int):
-            raiseError = True
+            raiseErrError = True
             val = lhs
         elif not isinstance(rhs, int):
-            raiseError = True
+            raiseErrError = True
             val = rhs
         type = '_int'
     if op in {"!=", "=="}:
         return
     if op in {"|", "&"}:
         if not isinstance(lhs, bool):
-            raiseError = True
+            raiseErrError = True
             val = lhs
         elif not isinstance(rhs, bool):
-            raiseError = True
+            raiseErrError = True
             val = rhs
         type = '_bool'
-    if raiseError:
+    if raiseErrError:
         print(f"lhs: {lhs}, rhs: {rhs}")
-        raise TypeError(f"Value {val} on line {lnum} cannot be used with '{op}' not type {type}")
- 
-    
+        raiseErr(f"TypeError: Value {val} on line {lnum} cannot be used with '{op}' not type {type}", lnum)
+
+
 """
     Validates that a constant or variable has been declared
 """
@@ -349,3 +351,15 @@ def validateName(name: str, variables: dict[str,  list[int | bool | str | None]]
     if name not in variables.keys():
         return False
     return True
+
+
+"""
+    Prints out the error message, and exits the program if the user is not in the REPL    
+"""
+def raiseErr(msg: str, lnum: int) -> None:
+    print(msg)
+    if lnum != 0:
+        print("Aborting... d('-' )z")
+        sys.exit()
+    else:
+        raise Exception
