@@ -1,0 +1,6 @@
+_int x .
+_string y .
+x _is 5 .
+y _is "5" .
+_int z .
+_int z _is x + y .
