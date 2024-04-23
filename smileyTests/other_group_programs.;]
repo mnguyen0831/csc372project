@@ -1,0 +1,97 @@
+$ Program1.txt
+_int max .
+_int min .
+_int sum .
+_int difference .
+_int product .
+_int gcd .
+_int lcm .
+_int x .
+_int y .
+_write "Input: " .
+_read x .
+_read y .
+_writeline "Output:" .
+
+$ Calculate the max and min
+_if x >= y _then {
+max _is x .
+min _is y .
+} _else {
+max _is y .
+min _is x .
+}
+
+$ Calculate the difference
+difference _is max - min .
+
+$ Calculate the sum
+sum _is x + y .
+
+$ Calculate the Product
+product _is x * y .
+
+$ Calculate the GCD
+_int dividend .
+dividend _is max .
+_int divisor .
+divisor _is min .
+_int remainder .
+_while divisor != 0 _do {
+	remainder _is dividend % divisor .
+
+    dividend _is divisor .
+
+    divisor _is remainder .
+}
+gcd _is dividend .
+
+$ Calculate LCM
+lcm _is x * y / gcd .
+
+$ Print all of the statements
+_writeline "Max = " + max .
+_writeline "Sum = " + sum .
+_writeline "Difference = " + difference .
+_writeline "Product = " + product .
+$ _writeline 1 . $ no idea why there is a 1 in the sample output
+_writeline "GCD = " + gcd .
+_writeline "LCM = " + lcm .
+
+$ Program2.txt
+_int a . $ part 1
+_int b .
+_int m .
+_read a .
+_read b .
+_read m .
+
+$ Printing the Stars
+_int i .
+i _is a . $ start at i=a=5 stars
+_while i <= b _do { $ end at i=b stars
+	_int j .
+	j _is 0 .
+	_while j < i _do { $ print i stars
+		_write "*" .
+		j ++ .
+	}
+	_writeline "" .
+	i ++ .
+}
+
+$ Calculating the Sum
+_int sum .
+sum _is 0 .
+i _is 1 .
+_while i < m _do {
+	_if ( i % a = 0 ) _then {
+        sum += i .
+    }
+	$ do not calculate multiples of a AND b
+	_if ( i % b = 0 & i % a != 0 ) _then {
+        sum += i .
+    }
+	i ++ .
+}
+_writeline sum .

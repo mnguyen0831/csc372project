@@ -1,12 +1,16 @@
 # Smiley
-### Langauge designed by Matthew Nguyen, Dylan Wilson, Omari Hughes, and Oscar Fischer
+### Language designed by Matthew Nguyen, Dylan Wilson, Omari Hughes, and Oscar Fischer
 
 ## How to run a Smiley file
 In the folder containing exprSmiley.py, parseSmiley.py, and runSmiley.py, run the command:
-    ```
+
+```
     python runSmiley.py --file 'file_name'
-    ```
+```
+    
 The file extension does not matter.
+
+NOTE: This must be run with Python version 3.9 or later.
 
 ### Flags
 All flags are optional, and may be used with any combination of other flags.
