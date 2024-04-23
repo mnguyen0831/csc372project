@@ -9,6 +9,7 @@
 def evalExpr(line: list[str], variables: dict[str,  list[int | bool | str | None]], lnum: int) -> int | bool | str:
     return expr(line, variables, lnum)[0]
 
+
 """
     Sorts through the expression token by token, sending the expression to the correct
     parsing function accordingly, returning the value of the entire expression as val,
@@ -62,6 +63,7 @@ def unaryExpr(line: list[str], variables: dict[str, list[int | bool | str | None
         val = not val
     return val, cur
 
+
 """
     Parses and evaluates the expression inside the parentheses
 """
@@ -80,6 +82,7 @@ def parenExpr(line: list[str], variables: dict[str,  list[int | bool | str | Non
     if parens != 0:
         raise SyntaxError(f"Missing parentheses on line {lnum}")
     return expr(lineStr[:i - 1].split(), variables, lnum)[0], lineStr[i:].split()
+
 
 """
     Parses and evaluates the base expression
@@ -102,6 +105,7 @@ def baseExpr(line: list[str], variables: dict[str,  list[int | bool | str | None
     else:
         raise ValueError(f"Token '{line[0]}' on line {lnum} is not a valid value")
     return val, (' ').join(line)[lenVal:].split()
+
 
 """
     Parses and evaluates the multiplication/division/mod expression
@@ -134,6 +138,7 @@ def multiExpr(val: int, line: list[str], variables: dict[str,  list[int | bool |
                 lhs = lhs % rhs
     return lhs, cur
 
+
 """
     Parses and evaluates the addition/subtraction expression
 """
@@ -161,6 +166,7 @@ def addExpr(val: int, line: list[str], variables: dict[str,  list[int | bool | s
         else:
             lhs = lhs - rhs
     return lhs, cur
+
 
 """
     Parses and evaluates the comparison expression
@@ -197,6 +203,7 @@ def compExpr(val: int | str, line: list[str], variables: dict[str,  list[int | b
             lhs = lhs >= rhs
     return lhs, cur
 
+
 """
     Parses and evaluates the and expression
 """
@@ -222,6 +229,7 @@ def andExpr(val: bool, line: list[str], variables: dict[str,  list[int | bool | 
         validateLR(op, lhs, rhs, lnum)
         lhs = lhs and rhs
     return lhs, cur
+
 
 """
     Parses and evaluates the or expression
@@ -251,6 +259,7 @@ def orExpr(val: bool, line: list[str], variables: dict[str,  list[int | bool | s
         lhs = lhs or rhs
     return lhs, cur
 
+
 """
     Validates int token
 """
@@ -260,6 +269,7 @@ def validateInt(i: str, lnum: int) -> int:
     except:
         raise TypeError(f"'{i}' at line {lnum} is not a valid _int value")
     return val
+
 
 """
     Validates bool token
@@ -273,6 +283,7 @@ def validateBool(b: str, lnum: int) -> bool:
         raise Exception(f"'{b}' at line {lnum} is not a valid _bool value")
     return val
 
+
 """
     Validates str token
 """
@@ -282,6 +293,7 @@ def validateStr(s: str, lnum: int) -> str:
     else:
         raise Exception(f"line {lnum} does not have a valid _str value")
     return val
+
 
 """
     Validates the type of val
@@ -297,6 +309,7 @@ def validateVal(type: str, val: int | bool | str, lnum: int) -> None:
     if raiseError:
         raise TypeError(f'Value {val} on line {lnum} is not type {type}')
     
+
 """
     Validates the left hand side value and the right hand side value of the operator token
 """
@@ -327,3 +340,12 @@ def validateLR(op: str, lhs: int | bool | str, rhs: int | bool | str, lnum: int)
     if raiseError:
         print(f"lhs: {lhs}, rhs: {rhs}")
         raise TypeError(f"Value {val} on line {lnum} cannot be used with '{op}' not type {type}")
+ 
+    
+"""
+    Validates that a constant or variable has been declared
+"""
+def validateName(name: str, variables: dict[str,  list[int | bool | str | None]]) -> bool:
+    if name not in variables.keys():
+        return False
+    return True

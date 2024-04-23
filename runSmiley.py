@@ -1,6 +1,7 @@
 import parseSmiley as smile
 import argparse
 
+
 """
     Command line flags
 """
@@ -9,6 +10,7 @@ repl: str
 print_vars: bool
 print_flow: bool
 
+
 """
     The list of all of the lines in the input program, where each line is split by 
     whitespace.
@@ -16,11 +18,13 @@ print_flow: bool
 """
 program: list[list[str]]
 
+
 """
     The current line of code that the program is on. It corresponds to the
     index cur_line - 1 in the 'program' global variable.
 """
 cur_line: int
+
 
 """
     List of variables that exist in the program.
@@ -29,6 +33,7 @@ cur_line: int
     type can be {'_int', '_bool', '_str', 'const _int', 'const _bool', 'const _str}
 """
 variables: dict[str, list[str, bool | int | str]]
+
 
 """
     Files can be run using:
@@ -62,6 +67,7 @@ def main() -> None:
     if print_vars:
         printVars()
 
+
 """
     Prints all of the existing variables, their types, and their values.
 """
@@ -72,6 +78,8 @@ def printVars() -> None:
         type: str = variables[var][0]
         val: int | str | bool = variables[var][1]
         print(f"{type} {var} _is {val}")
+    print()
+
 
 """
     Grabs all of the command line arguments that were used with runSmiley.py, and 
@@ -89,6 +97,7 @@ def getInput() -> None:
     input_file = args.input_file
     print_vars = args.vars
     print_flow = args.print_flow
+
 
 """
     Scans in the input file name, and stores it into the global program variable. 
@@ -108,6 +117,7 @@ def scanSmiley(fname: str) -> list[list[str]]:
     for line in lines:
         tokens.append(line.strip().split())
     return tokens
+
 
 """
     Sends the input line to the correct parsing function, which also executes the line.
@@ -153,6 +163,7 @@ def execute(line: list[str]) -> None:
             raise NameError(f"Variable '{line[0]}' at line {cur_line} hasn't been declared")
     cur_line += 1
 
+
 """
     Starts up the REPL. If the REPL is used in tandem with an input file, the REPL will
     use the variable list from the input file. If not, the REPL will begin with an
@@ -181,7 +192,7 @@ def lineIn() -> None:
             try:
                 execute(userIn.split())
             except NameError:
-                print("\tThe variable you attempted to use has not been initialized. Please try again.")
+                print("\tThe variable you attempted to use has not been initialized, or is invalid. Please try again.")
             except SyntaxError:
                 print("\tSomething in your syntax was invalid. Please try again.")
             except TypeError:
@@ -190,6 +201,7 @@ def lineIn() -> None:
                 print("\tAn input value is invalid. Please try again.")
             except Exception:
                 print("\tThe input line was invalid. Please try again.")
+
 
 """
     ifFlow walks the program through the _if structure, returning to the main function
@@ -281,14 +293,17 @@ def getIfStructure(start: int) -> tuple[int, list[int]]:
 
 
 '''
-    Moves through the while statement from the given line
+    whileFlow walks through the _while structure that begins on the input line, 
+    returning to the main function once the _while structure has been exited, updating
+    the cur_line variable to the line number after the structure's closing bracket
 '''
 def whileFlow(line) -> None:
     global program, variables, cur_line
     val = smile.whilest(line, variables, cur_line)
     end = getWhileStructure(cur_line)
+    start = cur_line + 1
 
-    start = cur_line+1
+    # Execute the statements in the while loop, and reevaluate the condition
     while val:
         cur_line = start
         while cur_line < end:
@@ -297,22 +312,23 @@ def whileFlow(line) -> None:
 
 
 '''
-    Finds the end of the while loop and returns the ending line
+    Returns the line number of the closing '}' for the while structure that begins on
+    line start
 '''
 def getWhileStructure(start: int) -> int:
     global program
     brackets = 1
     cur = start
-    line = program[cur]
+
+    # Get the line number of the '}' belonging to the while structure on line start - 1
     while brackets > 0:
         if '{' in program[cur]:
             brackets += 1
         if '}' in program[cur]:
             brackets -= 1
-
         cur += 1
-
     return cur
+
 
 if __name__ == "__main__":
     main()
