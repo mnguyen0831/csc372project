@@ -171,6 +171,7 @@ def elsest(line: list[str], variables: dict[str,  list[int | bool | str | None]]
             raiseErr(f"SyntaxError: '_else' on line {lnum} must immediately follow '}}", lnum)
         if len(line) != 3:
             raiseErr(f"SyntaxError: _else statement on line {lnum} cannot have an expression", lnum)
+        return True
     elif '_elseif' in line:
         if line[1] != '_elseif':
             raiseErr(f"SyntaxError: '_elseif' on line {lnum} must immediately follow '}}'", lnum)

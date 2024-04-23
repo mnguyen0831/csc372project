@@ -212,7 +212,7 @@ def ifFlow(line) -> None:
 
     # Pull out all of the line numbers for the _elseifs, and _else
     end, branches = getIfStructure(cur_line)
- 
+
     # Execute first _then if the _if expr is True
     if val:
         cur_line += 1
