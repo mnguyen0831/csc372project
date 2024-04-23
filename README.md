@@ -9,6 +9,7 @@ In the folder containing exprSmiley.py, parseSmiley.py, and runSmiley.py, run th
 ```
     
 The file extension does not matter.
+
 NOTE: This must be run with Python version 3.9 or later.
 
 ### Flags
